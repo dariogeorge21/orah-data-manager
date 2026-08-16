@@ -162,9 +162,23 @@
   },
   {
     "table_name": "registrations",
-    "column_name": "year_of_study",
+    "column_name": "affiliation",
     "data_type": "text",
     "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "table_name": "registrations",
+    "column_name": "institute",
+    "data_type": "text",
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "table_name": "registrations",
+    "column_name": "year_of_study",
+    "data_type": "text",
+    "is_nullable": "YES",
     "column_default": null
   },
   {
@@ -206,7 +220,7 @@
     "table_name": "registrations",
     "column_name": "college",
     "data_type": "text",
-    "is_nullable": "NO",
+    "is_nullable": "YES",
     "column_default": null
   },
   {
