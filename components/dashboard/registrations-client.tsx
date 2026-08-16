@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LayoutGrid, List, Search, ArrowRight, User, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface RegistrationsClientProps {
@@ -26,6 +27,9 @@ interface RegistrationsClientProps {
 export default function RegistrationsClient({ eventId, initialData }: RegistrationsClientProps) {
   const [view, setView] = useState<"table" | "card">("table");
   const [searchQuery, setSearchQuery] = useState("");
+  const [collegeFilter, setCollegeFilter] = useState("all");
+  const [yearFilter, setYearFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
@@ -44,48 +48,164 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
     setLoadingId(null);
   }, [pathname]);
 
-  const filteredData = initialData.filter((reg) => 
-    reg.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    reg.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    reg.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    reg.college?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const collegeOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        initialData
+          .map((reg) => reg.college)
+          .filter((value): value is string => Boolean(value && value.trim()))
+      )
+    ).sort((a, b) => a.localeCompare(b));
+  }, [initialData]);
+
+  const yearOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        initialData
+          .map((reg) => reg.year_of_study)
+          .filter((value): value is string => Boolean(value && value.trim()))
+      )
+    ).sort((a, b) => a.localeCompare(b));
+  }, [initialData]);
+
+  const filteredData = useMemo(() => {
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+
+    return initialData.filter((reg) => {
+      const matchesSearch =
+        normalizedSearch === "" ||
+        reg.name?.toLowerCase().includes(normalizedSearch) ||
+        reg.email?.toLowerCase().includes(normalizedSearch) ||
+        reg.phone?.toLowerCase().includes(normalizedSearch) ||
+        reg.college?.toLowerCase().includes(normalizedSearch);
+
+      const matchesCollege =
+        collegeFilter === "all" ||
+        (reg.college ?? "") === collegeFilter;
+
+      const matchesYear =
+        yearFilter === "all" ||
+        (reg.year_of_study ?? "") === yearFilter;
+
+      const registrationDate = reg.created_at
+        ? format(new Date(reg.created_at), "yyyy-MM-dd")
+        : "";
+      const matchesDate = dateFilter === "" || registrationDate === dateFilter;
+
+      return matchesSearch && matchesCollege && matchesYear && matchesDate;
+    });
+  }, [initialData, searchQuery, collegeFilter, yearFilter, dateFilter]);
+
+  const hasActiveFilters = collegeFilter !== "all" || yearFilter !== "all" || dateFilter !== "";
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, collegeFilter, yearFilter, dateFilter]);
+
+  const clearFilters = () => {
+    setCollegeFilter("all");
+    setYearFilter("all");
+    setDateFilter("");
+    setSearchQuery("");
+    setCurrentPage(1);
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-        <div className="relative w-full sm:w-96">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <Input 
-            placeholder="Search by name, email, college..." 
-            className="pl-12 h-12 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium placeholder:text-gray-400 placeholder:font-normal"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-          />
+      <div className="flex flex-col gap-4 bg-white p-4 sm:p-6 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="relative w-full sm:w-96">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Input 
+              placeholder="Search by name, email, college..." 
+              className="pl-12 h-12 text-base sm:text-sm bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium placeholder:text-gray-400 placeholder:font-normal"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 items-center gap-2 w-full sm:w-auto bg-gray-50 p-1.5 rounded-2xl border border-gray-200/60 shadow-inner">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setView("table")}
+              className={`rounded-xl px-4 h-10 sm:h-9 font-medium transition-all duration-300 ${view === "table" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
+            >
+              <List className="w-4 h-4 mr-2" />
+              Table
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setView("card")}
+              className={`rounded-xl px-4 h-10 sm:h-9 font-medium transition-all duration-300 ${view === "card" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
+            >
+              <LayoutGrid className="w-4 h-4 mr-2" />
+              Cards
+            </Button>
+          </div>
         </div>
-        
-        <div className="flex items-center gap-2 w-full sm:w-auto bg-gray-50 p-1.5 rounded-2xl border border-gray-200/60 shadow-inner">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setView("table")}
-            className={`rounded-xl px-4 h-9 font-medium transition-all duration-300 ${view === "table" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
-          >
-            <List className="w-4 h-4 mr-2" />
-            Table
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => setView("card")}
-            className={`rounded-xl px-4 h-9 font-medium transition-all duration-300 ${view === "card" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
-          >
-            <LayoutGrid className="w-4 h-4 mr-2" />
-            Cards
-          </Button>
+
+        <div className="rounded-2xl border border-gray-100 bg-gray-50/40 p-3 sm:p-4 space-y-3">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Filter Registrations</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <p className="text-xs font-semibold text-gray-500">College</p>
+              <Select value={collegeFilter} onValueChange={(value) => setCollegeFilter(value ?? "all")}>
+                <SelectTrigger className="w-full h-12 px-4 text-base sm:text-sm bg-white border-gray-200 hover:border-gray-300 focus:border-gray-900 rounded-xl">
+                  <SelectValue placeholder="Filter by college" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All colleges</SelectItem>
+                  {collegeOptions.map((college) => (
+                    <SelectItem key={college} value={college}>{college}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <p className="text-xs font-semibold text-gray-500">Year</p>
+              <Select value={yearFilter} onValueChange={(value) => setYearFilter(value ?? "all")}>
+                <SelectTrigger className="w-full h-12 px-4 text-base sm:text-sm bg-white border-gray-200 hover:border-gray-300 focus:border-gray-900 rounded-xl">
+                  <SelectValue placeholder="Filter by year" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All years</SelectItem>
+                  {yearOptions.map((year) => (
+                    <SelectItem key={year} value={year}>{year}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <p className="text-xs font-semibold text-gray-500">Registration Date</p>
+              <Input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="w-full h-12 px-4 text-base sm:text-sm bg-white border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-xl"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <p className="text-sm text-gray-500 font-medium">
+            Showing <span className="text-gray-900 font-semibold">{filteredData.length}</span> of {initialData.length} registrations
+          </p>
+
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              onClick={clearFilters}
+              className="h-11 sm:h-10 w-full sm:w-auto rounded-xl border-gray-200 hover:border-gray-300"
+            >
+              Clear filters
+            </Button>
+          )}
         </div>
       </div>
 

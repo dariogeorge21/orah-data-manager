@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { updateRegistration, deleteRegistration } from "@/features/actions/registrations";
 import { Input } from "@/components/ui/input";
@@ -26,23 +26,91 @@ interface RegistrationFormProps {
   registration: any;
 }
 
+const COLLEGE_OPTIONS = [
+  "St Joseph's College of Engineering and Technology, Choondacherry",
+  "St Joseph's Institute of Hotel Management and Catering Technology, Choondacherry",
+  "Alphonsa College, Pala",
+  "Devamatha College, Kuravilangad",
+  "St Thomas College, Pala",
+  "St Joseph's College, Moolamattom",
+  "St George's College, Aruvithuraura",
+  "St Stephen's College, Uzhavoor",
+  "Bishop Vayalil Memorial Holy Cross College, Cherpunkal",
+  "Mar Augusthinose College, Ramapuram",
+  "+2 Passout",
+  "IELTS",
+  "German",
+  "SSC",
+  "Other",
+];
+
+const YEAR_OPTIONS = [
+  "UG - 1st Year",
+  "UG - 2nd Year",
+  "UG - 3rd Year",
+  "UG - 4th Year",
+  "PG - 1st Year",
+  "PG - 2nd Year",
+  "Other",
+];
+
 export default function RegistrationForm({ eventId, registration }: RegistrationFormProps) {
   const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Determine initial dropdown vs custom values
+  const initialCollege = registration.college || "";
+  const initialCollegeIsKnown = COLLEGE_OPTIONS.includes(initialCollege);
+  const initialYear = registration.year_of_study || "";
+  const initialYearIsKnown = YEAR_OPTIONS.includes(initialYear);
 
   // State for form fields
   const [formData, setFormData] = useState({
     name: registration.name || "",
     email: registration.email || "",
     phone: registration.phone || "",
-    college: registration.college || "",
+    college: initialCollege,
     gender: registration.gender || "",
-    year_of_study: registration.year_of_study || "",
+    year_of_study: initialYear,
     parish: registration.parish || "",
     diocese: registration.diocese || "",
     address: registration.address || "",
   });
+
+  // College dropdown: selected option (may be "Other") and custom text
+  const [collegeSelect, setCollegeSelect] = useState<string>(
+    initialCollege === "" ? "" : initialCollegeIsKnown ? initialCollege : "Other"
+  );
+  const [collegeCustom, setCollegeCustom] = useState<string>(
+    initialCollegeIsKnown ? "" : initialCollege
+  );
+
+  // Year dropdown: selected option (may be "Other") and custom text
+  const [yearSelect, setYearSelect] = useState<string>(
+    initialYear === "" ? "" : initialYearIsKnown ? initialYear : "Other"
+  );
+  const [yearCustom, setYearCustom] = useState<string>(
+    initialYearIsKnown ? "" : initialYear
+  );
+
+  // Keep formData.college in sync with dropdown/custom state
+  useEffect(() => {
+    if (collegeSelect === "Other") {
+      setFormData((prev) => ({ ...prev, college: collegeCustom }));
+    } else {
+      setFormData((prev) => ({ ...prev, college: collegeSelect }));
+    }
+  }, [collegeSelect, collegeCustom]);
+
+  // Keep formData.year_of_study in sync with dropdown/custom state
+  useEffect(() => {
+    if (yearSelect === "Other") {
+      setFormData((prev) => ({ ...prev, year_of_study: yearCustom }));
+    } else {
+      setFormData((prev) => ({ ...prev, year_of_study: yearSelect }));
+    }
+  }, [yearSelect, yearCustom]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -147,23 +215,59 @@ export default function RegistrationForm({ eventId, registration }: Registration
 
             <div className="space-y-3">
               <Label htmlFor="college" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">College / Course</Label>
-              <Input
-                id="college"
-                name="college"
-                value={formData.college}
-                onChange={handleChange}
-                className="h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
-              />
+              <div className="flex gap-3 items-center">
+                <Select value={collegeSelect} onValueChange={(val) => { setCollegeSelect(val ?? ""); if (val !== "Other") setCollegeCustom(""); }}>
+                  <SelectTrigger id="college" className={`h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5 ${collegeSelect === "Other" ? "w-36 shrink-0" : "w-full"}`}>
+                    <SelectValue placeholder="Select college" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-gray-100 shadow-xl">
+                    {COLLEGE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt} value={opt} className="rounded-xl cursor-pointer">{opt}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {collegeSelect === "Other" && (
+                  <Input
+                    id="college_custom"
+                    name="college_custom"
+                    value={collegeCustom}
+                    onChange={(e) => setCollegeCustom(e.target.value)}
+                    placeholder="Enter college / course name"
+                    autoFocus
+                    className="h-14 flex-1 min-w-0 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
+                  />
+                )}
+              </div>
             </div>
             <div className="space-y-3">
               <Label htmlFor="year_of_study" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Year of Study</Label>
-              <Input
-                id="year_of_study"
-                name="year_of_study"
-                value={formData.year_of_study}
-                onChange={handleChange}
-                className="h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
-              />
+              <div className="flex gap-3 items-center">
+                <Select value={yearSelect} onValueChange={(val) => { setYearSelect(val ?? ""); if (val !== "Other") setYearCustom(""); }}>
+                  <SelectTrigger id="year_of_study" className={`h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5 ${yearSelect === "Other" ? "w-36 shrink-0" : "w-full"}`}>
+                    <SelectValue placeholder="Select year" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-gray-100 shadow-xl">
+                    <SelectItem value="UG - 1st Year" className="rounded-xl cursor-pointer">UG — 1st Year</SelectItem>
+                    <SelectItem value="UG - 2nd Year" className="rounded-xl cursor-pointer">UG — 2nd Year</SelectItem>
+                    <SelectItem value="UG - 3rd Year" className="rounded-xl cursor-pointer">UG — 3rd Year</SelectItem>
+                    <SelectItem value="UG - 4th Year" className="rounded-xl cursor-pointer">UG — 4th Year</SelectItem>
+                    <SelectItem value="PG - 1st Year" className="rounded-xl cursor-pointer">PG — 1st Year</SelectItem>
+                    <SelectItem value="PG - 2nd Year" className="rounded-xl cursor-pointer">PG — 2nd Year</SelectItem>
+                    <SelectItem value="Other" className="rounded-xl cursor-pointer">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                {yearSelect === "Other" && (
+                  <Input
+                    id="year_of_study_custom"
+                    name="year_of_study_custom"
+                    value={yearCustom}
+                    onChange={(e) => setYearCustom(e.target.value)}
+                    placeholder="Enter year / course level"
+                    autoFocus
+                    className="h-14 flex-1 min-w-0 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
+                  />
+                )}
+              </div>
             </div>
             <div className="space-y-3">
               <Label htmlFor="parish" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Parish</Label>

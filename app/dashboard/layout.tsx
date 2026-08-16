@@ -108,25 +108,25 @@ export default function DashboardLayout({
       </main>
 
       <Dialog open={showLogoutModal} onOpenChange={setShowLogoutModal}>
-        <DialogContent className="rounded-[32px] border-gray-100 shadow-2xl p-8 sm:max-w-[400px]">
+        <DialogContent className="w-[calc(100%-2rem)] sm:w-full max-w-[400px] rounded-[24px] sm:rounded-[32px] border-gray-100 shadow-2xl p-6 sm:p-8">
           <DialogHeader className="space-y-3">
-            <div className="mx-auto w-14 h-14 bg-red-50 rounded-[20px] flex items-center justify-center mb-2 shadow-sm border border-red-100">
-              <LogOut className="w-6 h-6 text-red-500" />
+            <div className="mx-auto w-12 h-12 sm:w-14 sm:h-14 bg-red-50 rounded-[16px] sm:rounded-[20px] flex items-center justify-center mb-1 sm:mb-2 shadow-sm border border-red-100">
+              <LogOut className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />
             </div>
-            <DialogTitle className="text-2xl font-bold text-center tracking-tight text-gray-900">
+            <DialogTitle className="text-xl sm:text-2xl font-bold text-center tracking-tight text-gray-900">
               Confirm Logout
             </DialogTitle>
-            <DialogDescription className="text-center text-gray-500 font-medium pt-2 text-base">
+            <DialogDescription className="text-center text-gray-500 font-medium pt-1 sm:pt-2 text-sm sm:text-base">
               Are you sure you want to log out of your account?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-8 flex flex-col sm:flex-row gap-3">
+          <DialogFooter className="mt-6 sm:mt-8 flex flex-col-reverse sm:flex-row gap-3 sm:gap-3">
             <Button 
               variant="outline" 
               type="button" 
               disabled={isLoggingOut} 
               onClick={() => setShowLogoutModal(false)}
-              className="h-12 rounded-xl font-semibold border-gray-200 hover:bg-gray-50 flex-1"
+              className="h-11 sm:h-12 rounded-xl font-semibold border-gray-200 hover:bg-gray-50 w-full sm:flex-1"
             >
               Cancel
             </Button>
@@ -134,7 +134,7 @@ export default function DashboardLayout({
               variant="destructive" 
               onClick={handleLogout} 
               disabled={isLoggingOut} 
-              className="h-12 rounded-xl font-semibold shadow-md bg-red-600 hover:bg-red-700 text-white flex-1"
+              className="h-11 sm:h-12 rounded-xl font-semibold shadow-md bg-red-600 hover:bg-red-700 text-white w-full sm:flex-1"
             >
               {isLoggingOut ? (
                 <span className="flex items-center gap-2">
