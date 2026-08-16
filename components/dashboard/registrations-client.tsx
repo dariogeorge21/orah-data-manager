@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LayoutGrid, List, Search, ArrowRight, User, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutGrid, List, Search, ArrowRight, User, Phone, Mail, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 
 interface RegistrationsClientProps {
   eventId: string;
@@ -32,6 +32,7 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
   const [dateFilter, setDateFilter] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
   const itemsPerPage = 25;
   
   const pathname = usePathname();
@@ -98,6 +99,20 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
 
   const hasActiveFilters = collegeFilter !== "all" || yearFilter !== "all" || dateFilter !== "";
 
+  const collegeKpis = useMemo(() => {
+    const counts: Record<string, number> = {};
+    filteredData.forEach((reg) => {
+      const college = reg.college?.trim();
+      if (college) {
+        counts[college] = (counts[college] || 0) + 1;
+      }
+    });
+    return Object.entries(counts)
+      .filter(([_, count]) => count > 0)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([college, count]) => ({ college, count }));
+  }, [filteredData]);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, collegeFilter, yearFilter, dateFilter]);
@@ -146,10 +161,23 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-100 bg-gray-50/40 p-3 sm:p-4 space-y-3">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Filter Registrations</p>
+        <div className="rounded-2xl border border-gray-100 bg-gray-50/40 p-3 sm:p-4">
+          <div 
+            className="flex items-center justify-between cursor-pointer md:cursor-default"
+            onClick={() => {
+              if (window.innerWidth < 768) {
+                setIsFiltersExpanded(!isFiltersExpanded);
+              }
+            }}
+          >
+            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Filter Registrations</p>
+            <button className="md:hidden text-gray-400 hover:text-gray-600 transition-colors">
+              {isFiltersExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className={`mt-3 ${!isFiltersExpanded ? 'hidden md:block' : 'block'}`}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="space-y-1.5">
               <p className="text-xs font-semibold text-gray-500">College</p>
               <Select value={collegeFilter} onValueChange={(value) => setCollegeFilter(value ?? "all")}>
@@ -191,6 +219,21 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
             </div>
           </div>
         </div>
+        </div>
+
+        {collegeKpis.length > 0 && (
+          <div className="rounded-2xl border border-gray-100 bg-gray-50/40 p-3 sm:p-4 space-y-3">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">Registrations by College</p>
+            <div className="flex flex-wrap gap-2">
+              {collegeKpis.map(({ college, count }) => (
+                <div key={college} className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-1.5 shadow-sm transition-all hover:border-gray-300">
+                  <span className="text-sm font-medium text-gray-700">{college}</span>
+                  <Badge variant="secondary" className="bg-gray-100 hover:bg-gray-200 transition-colors text-gray-900 font-bold px-2 rounded-lg">{count}</Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-sm text-gray-500 font-medium">
