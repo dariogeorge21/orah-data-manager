@@ -30,6 +30,13 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
   
   const pathname = usePathname();
 
+  // Set default view based on device size
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setView("card");
+    }
+  }, []);
+
   // Reset loading state if the user navigates back to this page
   useEffect(() => {
     setLoadingId(null);
