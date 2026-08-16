@@ -22,8 +22,8 @@ const geistMono = Geist_Mono({
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "",
-  description: "",
+  title: "JY PALA",
+  description: "A portal to access the events and registrations of events happening in Jesus Youth Pala",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
