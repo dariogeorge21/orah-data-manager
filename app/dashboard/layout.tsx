@@ -56,12 +56,13 @@ export default function DashboardLayout({
         </nav>
         
         <div className="p-5 border-t border-gray-50/50">
-          <form action={signOut}>
-            <button className="flex w-full items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors">
-              <LogOut className="w-5 h-5" />
-              Logout
-            </button>
-          </form>
+          <button 
+            onClick={() => signOut()}
+            className="flex w-full items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            Logout
+          </button>
         </div>
       </aside>
 
@@ -69,11 +70,12 @@ export default function DashboardLayout({
       <main className="flex-1 flex flex-col min-w-0 relative">
         <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-6 md:hidden sticky top-0 z-20">
           <h2 className="font-heading text-xl font-bold text-gray-900 tracking-tight">JY Pala Admin</h2>
-          <form action={signOut}>
-            <button className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors">
-              <LogOut className="w-5 h-5" />
-            </button>
-          </form>
+          <button 
+            onClick={() => signOut()}
+            className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
         </header>
         <div className="flex-1 p-6 md:p-10 lg:p-12 overflow-y-auto">
           <div className="max-w-[1600px] mx-auto">
