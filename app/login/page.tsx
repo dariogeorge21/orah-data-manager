@@ -41,7 +41,7 @@ export default function LoginPage() {
             />
           </div>
           <CardTitle className="text-3xl font-bold font-heading tracking-tight text-gray-900">
-            Welcome back
+            JESUS YOUTH PALA
           </CardTitle>
           <CardDescription className="text-gray-500 font-medium text-sm">
             Enter your credentials to access the dashboard
