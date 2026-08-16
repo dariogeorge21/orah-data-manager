@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { LayoutGrid, List, Search, ArrowRight, User, Phone, Mail } from "lucide-react";
+import { LayoutGrid, List, Search, ArrowRight, User, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface RegistrationsClientProps {
   eventId: string;
@@ -27,6 +27,8 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
   const [view, setView] = useState<"table" | "card">("table");
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25;
   
   const pathname = usePathname();
 
@@ -58,7 +60,10 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
             placeholder="Search by name, email, college..." 
             className="pl-12 h-12 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium placeholder:text-gray-400 placeholder:font-normal"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
           />
         </div>
         
@@ -152,55 +157,83 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredData.map((reg) => (
-                <Card key={reg.id} className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 border border-gray-100 rounded-[24px] group flex flex-col h-full">
-                  <CardHeader className="p-7 pb-4">
-                    <div className="flex justify-between items-start gap-4">
-                      <div>
-                        <h3 className="font-semibold text-xl tracking-tight text-gray-900 line-clamp-1">{reg.name}</h3>
-                        <p className="text-sm font-medium text-gray-500 mt-1 line-clamp-1">{reg.college}</p>
+            <div className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((reg) => (
+                  <Card key={reg.id} className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 border border-gray-100 rounded-[24px] group flex flex-col h-full">
+                    <CardHeader className="p-7 pb-4">
+                      <div className="flex justify-between items-start gap-4">
+                        <div>
+                          <h3 className="font-semibold text-xl tracking-tight text-gray-900 line-clamp-1">{reg.name}</h3>
+                          <p className="text-sm font-medium text-gray-500 mt-1 line-clamp-1">{reg.college}</p>
+                        </div>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-7 pt-2 flex flex-col flex-1 justify-end">
-                    <div className="space-y-3 mb-6 bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50">
-                      <div className="flex items-center justify-between overflow-hidden">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 shrink-0">Email</span>
-                        <a href={`mailto:${reg.email}`} className="text-sm font-medium text-gray-700 hover:text-blue-600 truncate ml-3 flex items-center gap-1.5 transition-colors group/link">
-                          <Mail className="w-3.5 h-3.5 text-gray-400 shrink-0 group-hover/link:text-blue-600" />
-                          <span className="truncate">{reg.email}</span>
-                        </a>
+                    </CardHeader>
+                    <CardContent className="p-7 pt-2 flex flex-col flex-1 justify-end">
+                      <div className="space-y-3 mb-6 bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50">
+                        <div className="flex items-center justify-between overflow-hidden">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 shrink-0">Email</span>
+                          <a href={`mailto:${reg.email}`} className="text-sm font-medium text-gray-700 hover:text-blue-600 truncate ml-3 flex items-center gap-1.5 transition-colors group/link">
+                            <Mail className="w-3.5 h-3.5 text-gray-400 shrink-0 group-hover/link:text-blue-600" />
+                            <span className="truncate">{reg.email}</span>
+                          </a>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 shrink-0">Phone</span>
+                          <a href={`tel:${reg.phone}`} className="text-sm font-medium text-gray-700 hover:text-blue-600 flex items-center gap-1.5 transition-colors group/link">
+                            <Phone className="w-3.5 h-3.5 text-gray-400 group-hover/link:text-blue-600" />
+                            {reg.phone}
+                          </a>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 shrink-0">Phone</span>
-                        <a href={`tel:${reg.phone}`} className="text-sm font-medium text-gray-700 hover:text-blue-600 flex items-center gap-1.5 transition-colors group/link">
-                          <Phone className="w-3.5 h-3.5 text-gray-400 group-hover/link:text-blue-600" />
-                          {reg.phone}
-                        </a>
-                      </div>
-                    </div>
-                    <Link 
-                      href={`/dashboard/events/${eventId}/registrations/${reg.id}`}
-                      onClick={() => setLoadingId(reg.id)}
-                      className={`w-full h-12 flex items-center justify-center font-semibold rounded-xl transition-all duration-300 shadow-sm ${
-                        loadingId === reg.id
-                          ? "bg-gray-900 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] pointer-events-none border border-gray-900" 
-                          : "bg-white border border-gray-200 hover:border-gray-900 hover:bg-gray-900 hover:text-white text-gray-900"
-                      }`}
-                    >
-                      {loadingId === reg.id ? (
-                        <span className="flex items-center gap-2">
-                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                          Loading...
-                        </span>
-                      ) : (
-                        "View Details"
-                      )}
-                    </Link>
-                  </CardContent>
-                </Card>
-              ))}
+                      <Link 
+                        href={`/dashboard/events/${eventId}/registrations/${reg.id}`}
+                        onClick={() => setLoadingId(reg.id)}
+                        className={`w-full h-12 flex items-center justify-center font-semibold rounded-xl transition-all duration-300 shadow-sm ${
+                          loadingId === reg.id
+                            ? "bg-gray-900 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] pointer-events-none border border-gray-900" 
+                            : "bg-white border border-gray-200 hover:border-gray-900 hover:bg-gray-900 hover:text-white text-gray-900"
+                        }`}
+                      >
+                        {loadingId === reg.id ? (
+                          <span className="flex items-center gap-2">
+                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                            Loading...
+                          </span>
+                        ) : (
+                          "View Details"
+                        )}
+                      </Link>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              
+              {Math.ceil(filteredData.length / itemsPerPage) > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="rounded-xl border-gray-200"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <span className="text-sm font-medium text-gray-600 px-4">
+                    Page {currentPage} of {Math.ceil(filteredData.length / itemsPerPage)}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredData.length / itemsPerPage), p + 1))}
+                    disabled={currentPage === Math.ceil(filteredData.length / itemsPerPage)}
+                    className="rounded-xl border-gray-200"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </>

@@ -10,14 +10,14 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { Trash2, Save, AlertTriangle } from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
@@ -30,7 +30,7 @@ export default function RegistrationForm({ eventId, registration }: Registration
   const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   // State for form fields
   const [formData, setFormData] = useState({
     name: registration.name || "",
@@ -56,11 +56,11 @@ export default function RegistrationForm({ eventId, registration }: Registration
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
-    
+
     const result = await updateRegistration(registration.id, eventId, formData);
-    
+
     setIsUpdating(false);
-    
+
     if (result.error) {
       toast.error("Error updating", {
         description: result.error,
@@ -75,11 +75,11 @@ export default function RegistrationForm({ eventId, registration }: Registration
 
   const handleDelete = async () => {
     setIsDeleting(true);
-    
+
     const result = await deleteRegistration(registration.id, eventId);
-    
+
     setIsDeleting(false);
-    
+
     if (result.error) {
       toast.error("Error deleting", {
         description: result.error,
@@ -99,34 +99,34 @@ export default function RegistrationForm({ eventId, registration }: Registration
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-3">
               <Label htmlFor="name" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Full Name</Label>
-              <Input 
-                id="name" 
-                name="name" 
-                value={formData.name} 
-                onChange={handleChange} 
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
                 required
                 className="h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
               />
             </div>
             <div className="space-y-3">
               <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Email Address</Label>
-              <Input 
-                id="email" 
-                name="email" 
-                type="email" 
-                value={formData.email} 
-                onChange={handleChange} 
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
                 required
                 className="h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
               />
             </div>
             <div className="space-y-3">
               <Label htmlFor="phone" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Phone Number</Label>
-              <Input 
-                id="phone" 
-                name="phone" 
-                value={formData.phone} 
-                onChange={handleChange} 
+              <Input
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
                 required
                 className="h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
               />
@@ -144,58 +144,58 @@ export default function RegistrationForm({ eventId, registration }: Registration
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="space-y-3">
-              <Label htmlFor="college" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">College / Institution</Label>
-              <Input 
-                id="college" 
-                name="college" 
-                value={formData.college} 
-                onChange={handleChange} 
+              <Label htmlFor="college" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">College / Course</Label>
+              <Input
+                id="college"
+                name="college"
+                value={formData.college}
+                onChange={handleChange}
                 className="h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
               />
             </div>
             <div className="space-y-3">
               <Label htmlFor="year_of_study" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Year of Study</Label>
-              <Input 
-                id="year_of_study" 
-                name="year_of_study" 
-                value={formData.year_of_study} 
-                onChange={handleChange} 
+              <Input
+                id="year_of_study"
+                name="year_of_study"
+                value={formData.year_of_study}
+                onChange={handleChange}
                 className="h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
               />
             </div>
             <div className="space-y-3">
               <Label htmlFor="parish" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Parish</Label>
-              <Input 
-                id="parish" 
-                name="parish" 
-                value={formData.parish} 
-                onChange={handleChange} 
+              <Input
+                id="parish"
+                name="parish"
+                value={formData.parish}
+                onChange={handleChange}
                 className="h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
               />
             </div>
             <div className="space-y-3">
               <Label htmlFor="diocese" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Diocese</Label>
-              <Input 
-                id="diocese" 
-                name="diocese" 
-                value={formData.diocese} 
-                onChange={handleChange} 
+              <Input
+                id="diocese"
+                name="diocese"
+                value={formData.diocese}
+                onChange={handleChange}
                 className="h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
               />
             </div>
             <div className="space-y-3 md:col-span-2">
               <Label htmlFor="address" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Address</Label>
-              <Input 
-                id="address" 
-                name="address" 
-                value={formData.address} 
-                onChange={handleChange} 
+              <Input
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
                 className="h-14 bg-gray-50/50 border-gray-200 hover:border-gray-300 focus:bg-white focus:border-gray-900 focus:ring-0 rounded-2xl transition-all duration-300 text-gray-900 font-medium px-5"
               />
             </div>
-            
+
             <div className="space-y-4 md:col-span-2 pt-8 border-t border-gray-100 mt-4">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Registration Metadata</Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -230,7 +230,7 @@ export default function RegistrationForm({ eventId, registration }: Registration
                   Delete Registration
                 </DialogTitle>
                 <DialogDescription className="text-center text-gray-500 font-medium pt-2 text-base">
-                  Are you sure you want to delete the registration for <strong className="text-gray-900">{registration.name}</strong>? 
+                  Are you sure you want to delete the registration for <strong className="text-gray-900">{registration.name}</strong>?
                   This action cannot be undone.
                 </DialogDescription>
               </DialogHeader>
