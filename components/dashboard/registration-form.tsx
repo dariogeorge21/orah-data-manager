@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { Trash2, Save, AlertTriangle, Building2, GraduationCap, School, Calendar, User, CheckCircle2 } from "lucide-react";
+import { Trash2, Save, AlertTriangle, Building2, GraduationCap, School, Calendar, User } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -517,12 +517,12 @@ export default function RegistrationForm({ eventId, registration }: Registration
               />
             </div>
 
-            {/* Metadata & Status */}
+            {/* Metadata */}
             <div className="space-y-4 md:col-span-2 pt-8 border-t border-gray-100 mt-4">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">
-                Registration Status & Metadata
+                Registration Metadata
               </Label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50 flex items-center justify-between">
                   <span className="font-medium text-gray-500">Registered on</span>
                   <span className="font-semibold text-gray-900">
@@ -533,23 +533,6 @@ export default function RegistrationForm({ eventId, registration }: Registration
                   <span className="font-medium text-gray-500">Ticket Type</span>
                   <span className="font-semibold text-gray-900 bg-white px-3 py-1 rounded-full border border-gray-100 shadow-sm">
                     {registration.registration_type}
-                  </span>
-                </div>
-                <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50 flex items-center justify-between">
-                  <span className="font-medium text-gray-500">Confirmation</span>
-                  <span className={`font-semibold px-3 py-1 rounded-full border shadow-sm flex items-center gap-1.5 ${
-                    formData.confirmed
-                      ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                      : "bg-amber-50 text-amber-700 border-amber-100"
-                  }`}>
-                    {formData.confirmed ? (
-                      <>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        Confirmed
-                      </>
-                    ) : (
-                      "Pending"
-                    )}
                   </span>
                 </div>
               </div>
