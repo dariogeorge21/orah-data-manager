@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { LayoutGrid, List, Search, ArrowRight, User } from "lucide-react";
+import { LayoutGrid, List, Search, ArrowRight, User, Phone, Mail } from "lucide-react";
 
 interface RegistrationsClientProps {
   eventId: string;
@@ -113,9 +113,15 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
                           {reg.name}
                         </TableCell>
                         <TableCell className="px-6 py-4">
-                          <div className="flex flex-col space-y-0.5">
-                            <span className="text-sm font-medium text-gray-700">{reg.email}</span>
-                            <span className="text-xs text-gray-500">{reg.phone}</span>
+                          <div className="flex flex-col space-y-1.5">
+                            <a href={`mailto:${reg.email}`} className="text-sm font-medium text-gray-700 hover:text-blue-600 flex items-center gap-1.5 transition-colors">
+                              <Mail className="w-3.5 h-3.5 text-gray-400 group-hover:text-blue-600" />
+                              <span className="truncate">{reg.email}</span>
+                            </a>
+                            <a href={`tel:${reg.phone}`} className="text-xs text-gray-500 hover:text-blue-600 flex items-center gap-1.5 transition-colors">
+                              <Phone className="w-3.5 h-3.5 text-gray-400 group-hover:text-blue-600" />
+                              {reg.phone}
+                            </a>
                           </div>
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-sm font-medium text-gray-600 max-w-[200px] truncate px-6 py-4">
@@ -158,15 +164,21 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
                     </div>
                   </CardHeader>
                   <CardContent className="p-7 pt-2 flex flex-col flex-1 justify-end">
-                    <div className="space-y-2 mb-6 bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50">
-                      <p className="text-sm font-medium text-gray-700 flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Email</span>
-                        <span className="truncate ml-2">{reg.email}</span>
-                      </p>
-                      <p className="text-sm font-medium text-gray-700 flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Phone</span>
-                        <span>{reg.phone}</span>
-                      </p>
+                    <div className="space-y-3 mb-6 bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50">
+                      <div className="flex items-center justify-between overflow-hidden">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 shrink-0">Email</span>
+                        <a href={`mailto:${reg.email}`} className="text-sm font-medium text-gray-700 hover:text-blue-600 truncate ml-3 flex items-center gap-1.5 transition-colors group/link">
+                          <Mail className="w-3.5 h-3.5 text-gray-400 shrink-0 group-hover/link:text-blue-600" />
+                          <span className="truncate">{reg.email}</span>
+                        </a>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 shrink-0">Phone</span>
+                        <a href={`tel:${reg.phone}`} className="text-sm font-medium text-gray-700 hover:text-blue-600 flex items-center gap-1.5 transition-colors group/link">
+                          <Phone className="w-3.5 h-3.5 text-gray-400 group-hover/link:text-blue-600" />
+                          {reg.phone}
+                        </a>
+                      </div>
                     </div>
                     <Link 
                       href={`/dashboard/events/${eventId}/registrations/${reg.id}`}
