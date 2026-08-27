@@ -22,6 +22,23 @@ export async function getRegistrationsByEvent(eventId: string) {
   return registrations;
 }
 
+export async function getAllRegistrations() {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+
+  const { data: registrations, error } = await supabase
+    .from("registrations")
+    .select("id, name, created_at, event_id, events(id, name)")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching all registrations:", error);
+    return [];
+  }
+
+  return registrations;
+}
+
 export async function getRegistrationById(id: string) {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);

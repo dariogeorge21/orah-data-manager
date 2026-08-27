@@ -4,7 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { LogOut, LayoutDashboard, CalendarDays } from "lucide-react";
+import { LogOut, LayoutDashboard, CalendarDays, Users } from "lucide-react";
 import { signOut } from "@/features/actions/auth";
 import { Button } from "@/components/ui/button";
 import { 
@@ -54,8 +54,8 @@ export default function DashboardLayout({
                 : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             )}
           >
-            <LayoutDashboard className="w-5 h-5" />
-            Overview
+            <Users className="w-5 h-5" />
+            Registrations by Date
           </Link>
           
           <div className="pt-6 pb-2">
@@ -65,7 +65,7 @@ export default function DashboardLayout({
           </div>
           
           <Link
-            href="/dashboard"
+            href="/dashboard/events"
             className={cn(
               "flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300",
               pathname.startsWith("/dashboard/events") 
@@ -74,7 +74,7 @@ export default function DashboardLayout({
             )}
           >
             <CalendarDays className="w-5 h-5" />
-            Events
+            Full Event Details
           </Link>
         </nav>
         
