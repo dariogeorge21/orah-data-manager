@@ -13,7 +13,8 @@ import {
   Sparkles,
   ListFilter,
   CheckCircle2,
-  CalendarCheck
+  CalendarCheck,
+  Ticket
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -264,6 +265,13 @@ export default function GroupedRegistrationsDashboard({
                 <div className="text-lg font-bold text-gray-900 leading-tight">{initialRegistrations.length}</div>
               </div>
             </div>
+            <Link
+              href="/dashboard/tickets"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold text-white bg-gray-900 hover:bg-black shadow-xs transition-all duration-200 group"
+            >
+              <Ticket className="w-3.5 h-3.5 text-amber-400" />
+              <span>Participant Tickets</span>
+            </Link>
             {activeEvent && (
               <Link
                 href={`/dashboard/events/${activeEvent.id}`}

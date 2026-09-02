@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { Trash2, Save, AlertTriangle, Building2, GraduationCap, School, Calendar, User } from "lucide-react";
+import { Trash2, Save, AlertTriangle, Building2, GraduationCap, School, Calendar, User, Download, Ticket as TicketIcon, Eye, QrCode } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +27,10 @@ import {
   YEAR_OPTIONS,
   GENDER_OPTIONS,
 } from "@/types/registration";
+import TicketModal from "@/components/tickets/ticket-modal";
+import DigitalTicket from "@/components/tickets/digital-ticket";
+import { generateTicketCode } from "@/lib/ticket-utils";
+import { downloadTicketAsPdf } from "@/lib/pdf-generator";
 
 interface RegistrationFormProps {
   eventId: string;
@@ -37,6 +41,38 @@ export default function RegistrationForm({ eventId, registration }: Registration
   const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDownloadingTicket, setIsDownloadingTicket] = useState(false);
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+
+  // Compute ticket code metadata
+  const ticketCodeMeta = generateTicketCode(
+    registration,
+    1, // Default sequence
+    registration.id
+  );
+
+  const handleDownloadTicketPdf = async () => {
+    setIsDownloadingTicket(true);
+    const canvasId = `form-ticket-canvas-${registration.id}`;
+    const cleanName = (registration.name || "Participant").replace(/[^a-zA-Z0-9_-]/g, "_");
+    const fileName = `ORAH2K26_Ticket_${cleanName}_${ticketCodeMeta.code}.pdf`;
+
+    toast.info("Generating high-resolution PDF ticket...", { duration: 2000 });
+
+    try {
+      const ok = await downloadTicketAsPdf(canvasId, fileName);
+      if (ok) {
+        toast.success("Ticket downloaded successfully!");
+      } else {
+        toast.error("Failed to generate PDF ticket");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error generating ticket PDF");
+    } finally {
+      setIsDownloadingTicket(false);
+    }
+  };
 
   // Derive initial values with backward compatibility for legacy records
   const rawAffiliation = registration.affiliation?.trim() || "";
@@ -517,8 +553,63 @@ export default function RegistrationForm({ eventId, registration }: Registration
               />
             </div>
 
-            {/* Metadata */}
+            {/* Digital Ticket Section */}
             <div className="space-y-4 md:col-span-2 pt-8 border-t border-gray-100 mt-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1 flex items-center gap-1.5">
+                  <TicketIcon className="w-3.5 h-3.5 text-amber-500" />
+                  Participant Digital Ticket
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsTicketModalOpen(true)}
+                    className="h-9 px-3 rounded-xl border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-1.5"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-gray-500" />
+                    Preview Pass
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDownloadTicketPdf}
+                    disabled={isDownloadingTicket}
+                    className="h-9 px-3 rounded-xl border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-1.5"
+                  >
+                    {isDownloadingTicket ? (
+                      <>
+                        <span className="w-3.5 h-3.5 border-2 border-gray-400 border-t-gray-900 rounded-full animate-spin"></span>
+                        <span>Exporting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-3.5 h-3.5 text-gray-500" />
+                        <span>Download PDF</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Interactive Ticket Preview Card */}
+              <div className="p-4 sm:p-6 bg-gray-950 rounded-2xl flex items-center justify-center overflow-x-auto shadow-inner border border-gray-800">
+                <div className="min-w-[650px] max-w-[850px] w-full">
+                  <DigitalTicket
+                    id={`form-ticket-canvas-${registration.id}`}
+                    registration={registration}
+                    ticketCode={ticketCodeMeta.code}
+                    sequenceNumber={1}
+                    ticketId={registration.id}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Metadata */}
+            <div className="space-y-4 md:col-span-2 pt-6 border-t border-gray-100">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">
                 Registration Metadata
               </Label>
@@ -530,9 +621,9 @@ export default function RegistrationForm({ eventId, registration }: Registration
                   </span>
                 </div>
                 <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50 flex items-center justify-between">
-                  <span className="font-medium text-gray-500">Ticket Type</span>
-                  <span className="font-semibold text-gray-900 bg-white px-3 py-1 rounded-full border border-gray-100 shadow-sm">
-                    {registration.registration_type}
+                  <span className="font-medium text-gray-500">Ticket Code</span>
+                  <span className="font-mono font-bold text-gray-900 bg-white px-3 py-1 rounded-full border border-gray-100 shadow-sm text-xs">
+                    {ticketCodeMeta.code}
                   </span>
                 </div>
               </div>
@@ -577,25 +668,57 @@ export default function RegistrationForm({ eventId, registration }: Registration
             </DialogContent>
           </Dialog>
 
-          <Button
-            type="submit"
-            className="h-14 px-8 rounded-2xl bg-gray-900 text-white hover:bg-black font-semibold shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-0.5 w-full sm:w-auto disabled:opacity-70 disabled:hover:translate-y-0"
-            disabled={isUpdating}
-          >
-            {isUpdating ? (
-              <span className="flex items-center gap-2">
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                Saving...
-              </span>
-            ) : (
-              <>
-                Save Changes
-                <Save className="w-5 h-5 ml-2" />
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleDownloadTicketPdf}
+              disabled={isDownloadingTicket}
+              className="h-14 px-6 rounded-2xl border-gray-200 hover:bg-gray-100 font-semibold text-gray-800 shadow-xs flex items-center gap-2 w-full sm:w-auto"
+            >
+              {isDownloadingTicket ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-gray-400 border-t-gray-900 rounded-full animate-spin"></span>
+                  Exporting...
+                </span>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  Download Ticket
+                </>
+              )}
+            </Button>
+
+            <Button
+              type="submit"
+              className="h-14 px-8 rounded-2xl bg-gray-900 text-white hover:bg-black font-semibold shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-0.5 w-full sm:w-auto disabled:opacity-70 disabled:hover:translate-y-0"
+              disabled={isUpdating}
+            >
+              {isUpdating ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  Saving...
+                </span>
+              ) : (
+                <>
+                  Save Changes
+                  <Save className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </Button>
+          </div>
         </CardFooter>
       </form>
+
+      {/* Ticket Modal */}
+      <TicketModal
+        open={isTicketModalOpen}
+        onOpenChange={setIsTicketModalOpen}
+        registration={registration}
+        ticketCode={ticketCodeMeta.code}
+        sequenceNumber={1}
+        ticketId={registration.id}
+      />
     </Card>
   );
 }

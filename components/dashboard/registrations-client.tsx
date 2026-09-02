@@ -33,9 +33,17 @@ import {
   Building2,
   GraduationCap,
   Sparkles,
-  X
+  X,
+  Ticket as TicketIcon,
+  Download,
+  Eye
 } from "lucide-react";
 import { Registration } from "@/types/registration";
+import TicketModal from "@/components/tickets/ticket-modal";
+import DigitalTicket from "@/components/tickets/digital-ticket";
+import { generateTicketCode } from "@/lib/ticket-utils";
+import { downloadTicketAsPdf } from "@/lib/pdf-generator";
+import { toast } from "sonner";
 
 interface RegistrationsClientProps {
   eventId: string;
@@ -100,13 +108,61 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
   const [currentPage, setCurrentPage] = useState(1);
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
   const itemsPerPage = 25;
+
+  // Ticket modal and download states
+  const [selectedTicketReg, setSelectedTicketReg] = useState<Registration | null>(null);
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [downloadingTicketId, setDownloadingTicketId] = useState<string | null>(null);
   
   const pathname = usePathname();
+
+  // Compute sequence map chronologically from initialData
+  const sequenceMap = useMemo(() => {
+    const map = new Map<string, number>();
+    const sorted = [...initialData].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+    sorted.forEach((item, index) => {
+      map.set(item.id, index + 1);
+    });
+    return map;
+  }, [initialData]);
 
   // Normalize all incoming registration items
   const normalizedRegistrations = useMemo(() => {
     return initialData.map(normalizeRegistration);
   }, [initialData]);
+
+  // Handle direct download of ticket PDF
+  const handleDownloadTicket = async (reg: Registration) => {
+    setDownloadingTicketId(reg.id);
+    const seq = sequenceMap.get(reg.id) || 1;
+    const ticketCodeMeta = generateTicketCode(reg, seq, reg.id);
+    const canvasId = `event-ticket-canvas-${reg.id}`;
+    const cleanName = (reg.name || "Participant").replace(/[^a-zA-Z0-9_-]/g, "_");
+    const fileName = `ORAH2K26_Ticket_${cleanName}_${ticketCodeMeta.code}.pdf`;
+
+    toast.info(`Generating ticket for ${reg.name}...`, { duration: 2000 });
+
+    try {
+      const ok = await downloadTicketAsPdf(canvasId, fileName);
+      if (ok) {
+        toast.success(`Ticket for ${reg.name} downloaded successfully!`);
+      } else {
+        toast.error("Failed to generate PDF ticket");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error generating ticket PDF");
+    } finally {
+      setDownloadingTicketId(null);
+    }
+  };
+
+  const handleOpenTicketModal = (reg: Registration) => {
+    setSelectedTicketReg(reg);
+    setIsTicketModalOpen(true);
+  };
 
   // Set default view based on device size
   useEffect(() => {
@@ -653,22 +709,45 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
 
                           {/* Actions */}
                           <TableCell className="text-right px-6 py-4">
-                            <Link 
-                              href={`/dashboard/events/${eventId}/registrations/${reg.id}`}
-                              onClick={() => setLoadingId(reg.id)}
-                              className="inline-flex items-center justify-center h-9 px-4 rounded-xl text-sm font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors group"
-                            >
-                              {loadingId === reg.id ? (
-                                <span className="flex items-center gap-2 text-gray-900">
-                                  <span className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></span>
-                                  Loading...
-                                </span>
-                              ) : (
-                                <>
-                                  Manage <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
-                                </>
-                              )}
-                            </Link>
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDownloadTicket(reg)}
+                                disabled={downloadingTicketId === reg.id}
+                                className="h-9 px-3 rounded-xl border-gray-200 hover:bg-gray-100 text-xs font-semibold text-gray-700 shadow-xs flex items-center gap-1.5"
+                                title="Download Ticket PDF"
+                              >
+                                {downloadingTicketId === reg.id ? (
+                                  <>
+                                    <span className="w-3.5 h-3.5 border-2 border-gray-400 border-t-gray-900 rounded-full animate-spin"></span>
+                                    <span>Exporting...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Download className="w-3.5 h-3.5 text-gray-500" />
+                                    <span>Ticket</span>
+                                  </>
+                                )}
+                              </Button>
+
+                              <Link 
+                                href={`/dashboard/events/${eventId}/registrations/${reg.id}`}
+                                onClick={() => setLoadingId(reg.id)}
+                                className="inline-flex items-center justify-center h-9 px-3.5 rounded-xl text-xs font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors group"
+                              >
+                                {loadingId === reg.id ? (
+                                  <span className="flex items-center gap-2 text-gray-900">
+                                    <span className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></span>
+                                    Loading...
+                                  </span>
+                                ) : (
+                                  <>
+                                    Manage <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                                  </>
+                                )}
+                              </Link>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -730,24 +809,45 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
                             </a>
                           </div>
                         </div>
-                        <Link 
-                          href={`/dashboard/events/${eventId}/registrations/${reg.id}`}
-                          onClick={() => setLoadingId(reg.id)}
-                          className={`w-full h-12 flex items-center justify-center font-semibold rounded-xl transition-all duration-300 shadow-sm ${
-                            loadingId === reg.id
-                              ? "bg-gray-900 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] pointer-events-none border border-gray-900" 
-                              : "bg-white border border-gray-200 hover:border-gray-900 hover:bg-gray-900 hover:text-white text-gray-900"
-                          }`}
-                        >
-                          {loadingId === reg.id ? (
-                            <span className="flex items-center gap-2">
-                              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                              Loading...
-                            </span>
-                          ) : (
-                            "View Details"
-                          )}
-                        </Link>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => handleDownloadTicket(reg)}
+                            disabled={downloadingTicketId === reg.id}
+                            className="h-12 font-semibold rounded-xl border-gray-200 hover:bg-gray-50 text-gray-800 text-xs shadow-xs"
+                          >
+                            {downloadingTicketId === reg.id ? (
+                              <span className="flex items-center gap-1.5">
+                                <span className="w-3.5 h-3.5 border-2 border-gray-400 border-t-gray-900 rounded-full animate-spin"></span>
+                                Exporting...
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-1.5">
+                                <Download className="w-3.5 h-3.5" />
+                                Ticket
+                              </span>
+                            )}
+                          </Button>
+
+                          <Link 
+                            href={`/dashboard/events/${eventId}/registrations/${reg.id}`}
+                            onClick={() => setLoadingId(reg.id)}
+                            className={`h-12 flex items-center justify-center font-semibold rounded-xl text-xs transition-all duration-300 shadow-xs ${
+                              loadingId === reg.id
+                                ? "bg-gray-900 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] pointer-events-none border border-gray-900" 
+                                : "bg-gray-900 hover:bg-black text-white"
+                            }`}
+                          >
+                            {loadingId === reg.id ? (
+                              <span className="flex items-center gap-2">
+                                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                Loading...
+                              </span>
+                            ) : (
+                              "Manage"
+                            )}
+                          </Link>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -781,6 +881,45 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
             </div>
           )}
         </>
+      )}
+
+      {/* Hidden Render Targets for Direct PDF Downloads */}
+      <div className="absolute left-[-9999px] top-[-9999px] pointer-events-none opacity-0">
+        {filteredData
+          .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+          .map((reg) => {
+            const seq = sequenceMap.get(reg.id) || 1;
+            const ticketCodeMeta = generateTicketCode(reg, seq, reg.id);
+            return (
+              <div key={`event-hidden-${reg.id}`} style={{ width: "940px", height: "300px" }}>
+                <DigitalTicket
+                  id={`event-ticket-canvas-${reg.id}`}
+                  registration={reg}
+                  ticketCode={ticketCodeMeta.code}
+                  sequenceNumber={seq}
+                  ticketId={reg.id}
+                />
+              </div>
+            );
+          })}
+      </div>
+
+      {/* Ticket Preview & Export Modal */}
+      {selectedTicketReg && (
+        <TicketModal
+          open={isTicketModalOpen}
+          onOpenChange={setIsTicketModalOpen}
+          registration={selectedTicketReg}
+          ticketCode={
+            generateTicketCode(
+              selectedTicketReg,
+              sequenceMap.get(selectedTicketReg.id) || 1,
+              selectedTicketReg.id
+            ).code
+          }
+          sequenceNumber={sequenceMap.get(selectedTicketReg.id) || 1}
+          ticketId={selectedTicketReg.id}
+        />
       )}
     </div>
   );

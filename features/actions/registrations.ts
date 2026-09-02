@@ -10,7 +10,7 @@ export async function getRegistrationsByEvent(eventId: string) {
 
   const { data: registrations, error } = await supabase
     .from("registrations")
-    .select("*")
+    .select("*, tickets(*)")
     .eq("event_id", eventId)
     .order("created_at", { ascending: false });
 
@@ -28,7 +28,7 @@ export async function getAllRegistrations() {
 
   const { data: registrations, error } = await supabase
     .from("registrations")
-    .select("id, name, created_at, event_id, events(id, name)")
+    .select("id, name, created_at, event_id, events(id, name), tickets(*)")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -45,7 +45,7 @@ export async function getRegistrationById(id: string) {
 
   const { data: registration, error } = await supabase
     .from("registrations")
-    .select("*")
+    .select("*, tickets(*)")
     .eq("id", id)
     .single();
 

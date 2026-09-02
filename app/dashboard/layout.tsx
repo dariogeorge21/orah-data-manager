@@ -4,8 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { LogOut, LayoutDashboard, CalendarDays, Users } from "lucide-react";
-import { signOut } from "@/features/actions/auth";
+import { LogOut, LayoutDashboard, CalendarDays, Users, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   Dialog, 
@@ -57,7 +56,7 @@ export default function DashboardLayout({
             <Users className="w-5 h-5" />
             Registrations by Date
           </Link>
-          
+
           <div className="pt-6 pb-2">
             <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
               Management
