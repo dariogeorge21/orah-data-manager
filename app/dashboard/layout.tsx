@@ -1,19 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { LogOut, LayoutDashboard, CalendarDays, Users, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function DashboardLayout({
   children,
@@ -21,13 +22,19 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await signOut();
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      await supabase.auth.signOut();
+      router.push("/login");
     } catch (error) {
       console.error(error);
       setIsLoggingOut(false);
@@ -42,19 +49,19 @@ export default function DashboardLayout({
         <div className="h-24 flex items-center px-8 border-b border-gray-50/50">
           <h2 className="font-heading text-xl font-bold text-gray-900 tracking-tight">JY Pala Admin</h2>
         </div>
-        
+
         <nav className="flex-1 px-5 py-8 space-y-2">
           <Link
             href="/dashboard"
             className={cn(
               "flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300",
-              pathname === "/dashboard" 
-                ? "bg-gray-900 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] hover:-translate-y-0.5" 
+              pathname === "/dashboard"
+                ? "bg-gray-900 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] hover:-translate-y-0.5"
                 : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             )}
           >
-            <Users className="w-5 h-5" />
-            Registrations by Date
+            <LayoutDashboard className="w-5 h-5" />
+            Overview
           </Link>
 
           <div className="pt-6 pb-2">
@@ -62,23 +69,36 @@ export default function DashboardLayout({
               Management
             </p>
           </div>
-          
+
           <Link
             href="/dashboard/events"
             className={cn(
               "flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300",
-              pathname.startsWith("/dashboard/events") 
-                ? "bg-gray-900 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] hover:-translate-y-0.5" 
+              pathname.startsWith("/dashboard/events")
+                ? "bg-gray-900 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] hover:-translate-y-0.5"
                 : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             )}
           >
             <CalendarDays className="w-5 h-5" />
             Full Event Details
           </Link>
+
+          <Link
+            href="/dashboard/tickets"
+            className={cn(
+              "flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300",
+              pathname.startsWith("/dashboard/tickets")
+                ? "bg-gray-900 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)] hover:-translate-y-0.5"
+                : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+            )}
+          >
+            <Ticket className="w-5 h-5" />
+            Participant Tickets
+          </Link>
         </nav>
-        
+
         <div className="p-5 border-t border-gray-50/50">
-          <button 
+          <button
             onClick={() => setShowLogoutModal(true)}
             className="flex w-full items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
           >
@@ -92,7 +112,7 @@ export default function DashboardLayout({
       <main className="flex-1 flex flex-col min-w-0 relative">
         <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-6 md:hidden sticky top-0 z-20">
           <h2 className="font-heading text-xl font-bold text-gray-900 tracking-tight">JY Pala Admin</h2>
-          <button 
+          <button
             onClick={() => setShowLogoutModal(true)}
             className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
           >
@@ -120,19 +140,19 @@ export default function DashboardLayout({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-6 sm:mt-8 flex flex-col-reverse sm:flex-row gap-3 sm:gap-3">
-            <Button 
-              variant="outline" 
-              type="button" 
-              disabled={isLoggingOut} 
+            <Button
+              variant="outline"
+              type="button"
+              disabled={isLoggingOut}
               onClick={() => setShowLogoutModal(false)}
               className="h-11 sm:h-12 rounded-xl font-semibold border-gray-200 hover:bg-gray-50 w-full sm:flex-1"
             >
               Cancel
             </Button>
-            <Button 
-              variant="destructive" 
-              onClick={handleLogout} 
-              disabled={isLoggingOut} 
+            <Button
+              variant="destructive"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
               className="h-11 sm:h-12 rounded-xl font-semibold shadow-md bg-red-600 hover:bg-red-700 text-white w-full sm:flex-1"
             >
               {isLoggingOut ? (

@@ -67,14 +67,10 @@ export default function DigitalTicket({
     });
 
     generateQrCodeDataUrl(payload).then((url) => {
-      if (isMounted) {
-        setQrCodeDataUrl(url);
-      }
+      if (isMounted) setQrCodeDataUrl(url);
     });
 
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [ticketId, ticketCode, registration, affiliation]);
 
   return (
@@ -87,19 +83,35 @@ export default function DigitalTicket({
         fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       }}
     >
-      {/* Background subtle noise/texture overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+      {/* Background subtle texture overlay — inline rgba to avoid oklch issues */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "linear-gradient(to right, transparent, rgba(255,255,255,0.10), transparent)" }}
+      />
 
       <div className="flex h-full w-full">
+
         {/* ================= LEFT SECTION: Concert Live Atmosphere Banner ================= */}
         <div className="relative w-[30%] min-w-[140px] max-w-[280px] h-full overflow-hidden bg-[#12131C] shrink-0">
-          {/* Stylized Concert Crowd / Stage Lighting SVG vector visual */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-[#1E1B2E]/90 to-[#0F172A] opacity-95" />
+          {/* Stylized Concert Crowd / Stage Lighting — inline hex to avoid lab()/oklch() */}
+          <div
+            className="absolute inset-0 opacity-95"
+            style={{ background: "linear-gradient(to top, #000000, #1E1B2E, #0F172A)" }}
+          />
 
           {/* Stage Light Cones */}
-          <div className="absolute top-0 left-1/4 w-32 h-64 bg-gradient-to-b from-amber-400/30 via-rose-500/10 to-transparent transform -rotate-12 blur-md" />
-          <div className="absolute top-0 right-1/4 w-32 h-64 bg-gradient-to-b from-cyan-400/30 via-indigo-500/10 to-transparent transform rotate-12 blur-md" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-48 bg-gradient-to-b from-white/40 via-amber-200/20 to-transparent blur-sm" />
+          <div
+            className="absolute top-0 left-1/4 w-32 h-64 transform -rotate-12 blur-md"
+            style={{ background: "linear-gradient(to bottom, rgba(251,191,36,0.30), rgba(244,63,94,0.10), transparent)" }}
+          />
+          <div
+            className="absolute top-0 right-1/4 w-32 h-64 transform rotate-12 blur-md"
+            style={{ background: "linear-gradient(to bottom, rgba(34,211,238,0.30), rgba(99,102,241,0.10), transparent)" }}
+          />
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-48 blur-sm"
+            style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.40), rgba(253,230,138,0.20), transparent)" }}
+          />
 
           {/* Concert Crowd Silhouette */}
           <svg
@@ -108,25 +120,21 @@ export default function DigitalTicket({
             fill="currentColor"
             preserveAspectRatio="none"
           >
-            {/* Ambient concert hands and heads */}
             <path d="M0,160 L0,110 C15,105 25,120 35,95 C45,130 55,90 65,85 C75,115 85,95 95,75 C105,105 115,80 125,70 C135,110 145,85 155,60 C165,100 175,90 185,75 C195,110 205,80 215,85 C225,120 235,95 245,65 C255,105 265,90 275,100 C285,85 295,120 300,105 L300,160 Z" opacity="0.7"/>
             <path d="M0,160 L0,125 C20,120 30,140 45,115 C55,145 70,110 85,105 C100,135 115,115 130,95 C145,125 160,100 175,85 C190,125 205,105 220,90 C235,120 250,110 265,95 C280,130 290,115 300,120 L300,160 Z" opacity="0.9"/>
-            
             {/* Raised hands & arms */}
             <path d="M45,115 Q48,70 52,50 Q56,70 58,115 Z" fill="#000" />
             <path d="M50,55 L42,42 Q46,38 52,48 Z" fill="#000" />
             <path d="M54,52 L62,40 Q66,45 58,54 Z" fill="#000" />
-            
             <path d="M125,95 Q130,45 136,30 Q142,45 146,95 Z" fill="#000" />
             <path d="M132,35 L124,20 Q129,16 135,26 Z" fill="#000" />
             <path d="M138,32 L146,18 Q152,22 144,34 Z" fill="#000" />
-            
             <path d="M210,100 Q215,55 220,38 Q226,55 230,100 Z" fill="#000" />
             <path d="M218,42 L210,28 Q215,24 222,34 Z" fill="#000" />
             <path d="M224,40 L232,25 Q238,30 228,42 Z" fill="#000" />
           </svg>
 
-          {/* Event Brand Tag on the photo */}
+          {/* Event Brand Tag */}
           <div className="absolute top-4 left-4 z-10 flex flex-col">
             <span className="text-[9px] font-black uppercase tracking-widest text-amber-400 drop-shadow-md">
               JY Pala Presents
@@ -152,7 +160,7 @@ export default function DigitalTicket({
                 WE ARE GOING TO SEE...
               </p>
               <p className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
-                Youth Gathering & Festival
+                Youth Gathering &amp; Festival
               </p>
             </div>
 
@@ -166,7 +174,7 @@ export default function DigitalTicket({
             </div>
           </div>
 
-          {/* Center: Attendee / Artist Headline */}
+          {/* Center: Attendee Headline */}
           <div className="my-auto py-1">
             <h2
               className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 tracking-tight leading-none truncate max-w-[420px]"
@@ -184,19 +192,14 @@ export default function DigitalTicket({
             )}
           </div>
 
-          {/* Bottom Row: 3 Rounded Pill Badges matching reference ticket */}
+          {/* Bottom Row: 3 Rounded Pill Badges */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-1">
-            {/* Date Pill */}
             <div className="px-3.5 sm:px-4 py-1.5 rounded-full border-2 border-gray-900 bg-transparent text-gray-900 font-extrabold text-[10px] sm:text-xs uppercase tracking-wider shadow-xs">
               {date}
             </div>
-
-            {/* Time Pill */}
             <div className="px-3.5 sm:px-4 py-1.5 rounded-full border-2 border-gray-900 bg-transparent text-gray-900 font-extrabold text-[10px] sm:text-xs uppercase tracking-wider shadow-xs">
               {time}
             </div>
-
-            {/* Arena / Venue Pass Pill */}
             <div className="px-3.5 sm:px-4 py-1.5 rounded-full border-2 border-gray-900 bg-transparent text-gray-900 font-extrabold text-[10px] sm:text-xs uppercase tracking-wider shadow-xs">
               PASS #{formattedSeq}
             </div>
@@ -207,52 +210,52 @@ export default function DigitalTicket({
         <div className="relative w-0 flex flex-col justify-between items-center shrink-0">
           {/* Top Notch Cutout */}
           <div className="w-6 h-6 rounded-full bg-black -mt-3 shadow-inner z-20" />
-
           {/* Perforation Dashed Line */}
           <div className="w-0 flex-1 border-r-2 border-dashed border-gray-400 my-1 z-10" />
-
           {/* Bottom Notch Cutout */}
           <div className="w-6 h-6 rounded-full bg-black -mb-3 shadow-inner z-20" />
         </div>
 
-        {/* ================= RIGHT SECTION: Stub — QR Code centered ================= */}
-        <div className="w-[28%] min-w-[140px] max-w-[220px] flex flex-col items-center justify-center gap-3 px-4 py-4 bg-[#DCD9D0] shrink-0 relative overflow-hidden">
-          {/* Scannable QR Code — centered and dominant */}
-          <div className="w-[80px] h-[80px] sm:w-[96px] sm:h-[96px] bg-white p-1.5 rounded-xl shadow-sm border border-gray-300 flex items-center justify-center shrink-0">
-            {qrCodeDataUrl ? (
-              <img
-                src={qrCodeDataUrl}
-                alt={`QR code for ${ticketCode}`}
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-100 animate-pulse rounded" />
-            )}
+        {/* ================= RIGHT SECTION: Stub — Vertical Barcode & Centered QR ================= */}
+        <div className="w-[28%] min-w-[150px] max-w-[240px] flex items-center justify-between p-4 sm:p-5 bg-[#DCD9D0] shrink-0 relative overflow-hidden">
+          {/* Vertical Barcode & Rotated Ticket Code Strip */}
+          <div className="flex items-center gap-2 h-full py-1 shrink-0">
+            {/* Vertical Barcode Graphic */}
+            <svg className="h-full w-5 sm:w-6 text-gray-900" viewBox="0 0 26 160" preserveAspectRatio="none">
+              <rect x="0"  y="0" width="2.5" height="160" fill="currentColor"/>
+              <rect x="4"  y="0" width="1.2" height="160" fill="currentColor"/>
+              <rect x="6.5" y="0" width="3"   height="160" fill="currentColor"/>
+              <rect x="11" y="0" width="1.5" height="160" fill="currentColor"/>
+              <rect x="14" y="0" width="1.2" height="160" fill="currentColor"/>
+              <rect x="16.5" y="0" width="3.5" height="160" fill="currentColor"/>
+              <rect x="21.5" y="0" width="1.8" height="160" fill="currentColor"/>
+              <rect x="24.5" y="0" width="1.2" height="160" fill="currentColor"/>
+            </svg>
+
+            {/* Vertical Rotated Ticket Code Label */}
+            <div className="flex items-center justify-center [writing-mode:vertical-lr] rotate-180 select-none">
+              <span className="text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest text-gray-600 whitespace-nowrap">
+                {ticketCode}
+              </span>
+            </div>
           </div>
 
-          {/* Barcode + Ticket Code — below the QR */}
-          <div className="flex flex-col items-center gap-1.5 w-full">
-            {/* Horizontal Barcode Graphic */}
-            <svg className="w-full h-7 text-gray-900" viewBox="0 0 120 28" preserveAspectRatio="none">
-              <rect x="0"   y="0" width="6"   height="28" fill="currentColor"/>
-              <rect x="9"   y="0" width="3"   height="28" fill="currentColor"/>
-              <rect x="15"  y="0" width="8"   height="28" fill="currentColor"/>
-              <rect x="26"  y="0" width="4"   height="28" fill="currentColor"/>
-              <rect x="33"  y="0" width="2"   height="28" fill="currentColor"/>
-              <rect x="38"  y="0" width="10"  height="28" fill="currentColor"/>
-              <rect x="51"  y="0" width="3"   height="28" fill="currentColor"/>
-              <rect x="57"  y="0" width="6"   height="28" fill="currentColor"/>
-              <rect x="66"  y="0" width="2"   height="28" fill="currentColor"/>
-              <rect x="71"  y="0" width="8"   height="28" fill="currentColor"/>
-              <rect x="83"  y="0" width="3"   height="28" fill="currentColor"/>
-              <rect x="89"  y="0" width="5"   height="28" fill="currentColor"/>
-              <rect x="97"  y="0" width="2"   height="28" fill="currentColor"/>
-              <rect x="103" y="0" width="7"   height="28" fill="currentColor"/>
-              <rect x="113" y="0" width="4"   height="28" fill="currentColor"/>
-            </svg>
-            {/* Ticket Code label */}
-            <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-gray-500 text-center whitespace-nowrap truncate max-w-full px-1">
-              {ticketCode}
+          {/* Right Column: Centered Scannable QR Code & Entry Badge — shifted slightly left */}
+          <div className="flex-1 flex flex-col items-center justify-center gap-2 pr-2 sm:pr-3 pl-0 h-full">
+            <div className="w-[100px] h-[100px] sm:w-[110px] sm:h-[110px] bg-white p-1.5 sm:p-2 rounded-2xl shadow-sm border border-gray-300 flex items-center justify-center shrink-0">
+              {qrCodeDataUrl ? (
+                <img
+                  src={qrCodeDataUrl}
+                  alt={`QR code for ${ticketCode}`}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-100 animate-pulse rounded-xl" />
+              )}
+            </div>
+
+            <span className="inline-block px-2.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider text-gray-700 bg-gray-200/90 border border-gray-300/70 shadow-2xs whitespace-nowrap">
+              SCAN AT EVENT
             </span>
           </div>
         </div>
@@ -260,4 +263,3 @@ export default function DigitalTicket({
     </div>
   );
 }
-
