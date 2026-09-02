@@ -94,7 +94,7 @@ export default function DigitalTicket({
         {/* ================= LEFT SECTION: Event Image Banner ================= */}
         <div className="relative w-[30%] min-w-[140px] max-w-[280px] h-full overflow-hidden bg-[#12131C] shrink-0">
           <img
-            src="/ticketBanner.png"
+            src="/ticketBanner.jpeg"
             alt="ORAH 2K26 Banner"
             className="w-full h-full object-cover object-center"
           />
