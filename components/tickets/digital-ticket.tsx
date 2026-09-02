@@ -191,7 +191,7 @@ export default function DigitalTicket({
 
           {/* Right Column: Centered Scannable QR Code & Entry Badge */}
           <div className="flex-1 flex flex-col items-center justify-center gap-1.5 sm:gap-2 pl-1.5 sm:pl-2 pr-1 h-full">
-            <div className="w-[95px] h-[95px] sm:w-[105px] sm:h-[105px] bg-white p-1.5 sm:p-2 rounded-2xl shadow-sm border border-gray-300 flex items-center justify-center shrink-0">
+            <div className="w-[105px] h-[105px] sm:w-[116px] sm:h-[116px] bg-white p-1.5 sm:p-2 rounded-2xl shadow-sm border border-gray-300 flex items-center justify-center shrink-0">
               {qrCodeDataUrl ? (
                 <img
                   src={qrCodeDataUrl}
