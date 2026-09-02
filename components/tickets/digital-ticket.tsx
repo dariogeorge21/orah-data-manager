@@ -106,10 +106,10 @@ export default function DigitalTicket({
           <div className="flex items-start justify-between gap-2">
             <div>
               <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-gray-700">
-                WE ARE GOING TO SEE...
+                LET'S GATHER AT...
               </p>
               <p className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
-                Youth Gathering &amp; Festival
+                Youth Gathering
               </p>
             </div>
 
@@ -118,7 +118,7 @@ export default function DigitalTicket({
                 {venue}
               </p>
               <p className="text-[9px] sm:text-[10px] font-medium text-gray-500 uppercase tracking-wider">
-                Pala, Kerala
+                Pala, Kottayam
               </p>
             </div>
           </div>
