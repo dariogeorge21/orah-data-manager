@@ -71,7 +71,7 @@ export default function DigitalTicket({
   return (
     <div
       id={id}
-      className={`relative w-full max-w-[940px] select-none overflow-hidden rounded-[24px] bg-[#E3E0D8] text-gray-900 shadow-2xl transition-all ${className}`}
+      className={`relative w-full max-w-[940px] select-none overflow-hidden rounded-r-[24px] rounded-l-none bg-[#E3E0D8] text-gray-900 shadow-2xl transition-all ${className}`}
       style={{
         aspectRatio: "940 / 300",
         minHeight: "270px",
@@ -86,12 +86,12 @@ export default function DigitalTicket({
 
       <div className="flex h-full w-full">
 
-        {/* ================= LEFT SECTION: Event Image Banner ================= */}
-        <div className="relative w-[30%] min-w-[140px] max-w-[280px] h-full overflow-hidden bg-[#12131C] shrink-0">
+        {/* ================= LEFT SECTION: Event Image Banner (Square, No Rounded Corners) ================= */}
+        <div className="relative h-full aspect-square overflow-hidden bg-[#12131C] shrink-0 rounded-none">
           <img
             src="/ticketBanner.jpeg"
             alt="ORAH 2K26 Banner"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-center rounded-none"
           />
         </div>
 
