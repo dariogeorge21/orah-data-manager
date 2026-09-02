@@ -57,21 +57,16 @@ export default function DigitalTicket({
 
   useEffect(() => {
     let isMounted = true;
-    const payload = buildTicketQrPayload({
-      ticketId: ticketId || registration.id,
-      ticketCode,
-      registrationId: registration.id,
-      name: registration.name,
-      affiliation,
-      college: registration.college,
-    });
+    const qrContent = ticketId || registration.id;
 
-    generateQrCodeDataUrl(payload).then((url) => {
+    generateQrCodeDataUrl(qrContent).then((url) => {
       if (isMounted) setQrCodeDataUrl(url);
     });
 
-    return () => { isMounted = false; };
-  }, [ticketId, ticketCode, registration, affiliation]);
+    return () => {
+      isMounted = false;
+    };
+  }, [ticketId, registration.id]);
 
   return (
     <div
