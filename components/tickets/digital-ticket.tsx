@@ -92,11 +92,16 @@ export default function DigitalTicket({
       <div className="flex h-full w-full">
 
         {/* ================= LEFT SECTION: Concert Live Atmosphere Banner ================= */}
+        {/* ================= LEFT SECTION: Event Image Banner ================= */}
         <div className="relative w-[30%] min-w-[140px] max-w-[280px] h-full overflow-hidden bg-[#12131C] shrink-0">
           {/* Stylized Concert Crowd / Stage Lighting — inline hex to avoid lab()/oklch() */}
           <div
             className="absolute inset-0 opacity-95"
             style={{ background: "linear-gradient(to top, #000000, #1E1B2E, #0F172A)" }}
+          <img
+            src="/ticketBanner.png"
+            alt="ORAH 2K26 Banner"
+            className="w-full h-full object-cover object-center"
           />
 
           {/* Stage Light Cones */}
