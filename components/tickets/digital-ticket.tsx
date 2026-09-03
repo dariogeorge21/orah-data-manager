@@ -30,7 +30,7 @@ export default function DigitalTicket({
   sequenceNumber,
   ticketId,
   eventName = "ORAH 2K26",
-  venue = "St Thomas College, Palai",
+  venue = "St Thomas College",
   date = "SEP 19",
   time = "5:00 PM",
   className = "",
@@ -121,14 +121,14 @@ export default function DigitalTicket({
           {/* Center: Attendee Headline */}
           <div className="my-auto py-1">
             <h2
-              className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 tracking-tight leading-none truncate max-w-[380px]"
+              className="text-2xl sm:text-3xl pb-2 lg:text-4xl font-black text-gray-900 tracking-tight leading-none truncate max-w-[380px]"
               title={registration.name}
             >
               {registration.name}
             </h2>
             {institutionText && (
               <p
-                className="text-xs sm:text-sm font-semibold text-gray-700 truncate max-w-[360px] mt-1 tracking-tight"
+                className="text-xs sm:text-sm font-semibold text-gray-700 truncate max-w-[400px] mt-1 tracking-tight leading-snug line-clamp-2 break-words"
                 title={institutionText}
               >
                 {institutionText}
@@ -184,9 +184,19 @@ export default function DigitalTicket({
             </div>
           </div>
 
-          {/* Right Column: Centered Scannable QR Code & Entry Badge */}
-          <div className="flex-1 flex flex-col items-center justify-center gap-1.5 sm:gap-2 pl-1.5 sm:pl-2 pr-1 h-full">
-            <div className="w-[105px] h-[105px] sm:w-[116px] sm:h-[116px] bg-white p-1.5 sm:p-2 rounded-2xl shadow-sm border border-gray-300 flex items-center justify-center shrink-0">
+          {/* Right Column: JY Logo, Centered Large Scannable QR Code & Entry Badge */}
+          <div className="flex-1 flex flex-col items-center justify-between py-0.5 pl-1.5 sm:pl-2 pr-1 h-full">
+            {/* Jesus Youth Logo */}
+            <div className="w-12 h-12">
+              <img
+                src="/jyLogo.png"
+                alt="Jesus Youth Logo"
+                className="w-full h-full object-contain drop-shadow-xs"
+              />
+            </div>
+
+            {/* Large Scannable QR Code */}
+            <div className="w-[208px] h-[208px] sm:w-[118px] sm:h-[118px] bg-white p-1.5 rounded-2xl shadow-sm border border-gray-300 flex items-center justify-center shrink-0">
               {qrCodeDataUrl ? (
                 <img
                   src={qrCodeDataUrl}
@@ -198,6 +208,7 @@ export default function DigitalTicket({
               )}
             </div>
 
+            {/* Entry Badge */}
             <span className="inline-block px-2 sm:px-2.5 py-0.5 rounded-full text-[7.5px] sm:text-[8.5px] font-bold uppercase tracking-wider text-gray-700 bg-gray-200/90 border border-gray-300/70 shadow-2xs whitespace-nowrap">
               SCAN AT EVENT
             </span>
