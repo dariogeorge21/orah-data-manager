@@ -147,18 +147,77 @@ export function generateTicketCode(
 }
 
 /**
- * Generates QR code as base64 Data URL
+ * Generates QR code as base64 Data URL with optional centered logo.
+ * Uses high error correction (Level 'H' - 30% recovery) so that placing
+ * the logo in the center does not compromise QR code scannability.
  */
-export async function generateQrCodeDataUrl(content: string): Promise<string> {
+export async function generateQrCodeDataUrl(
+  content: string,
+  logoUrl?: string
+): Promise<string> {
   try {
+    if (typeof window !== "undefined" && logoUrl) {
+      const canvas = document.createElement("canvas");
+      // Render the QR code on the canvas with error correction level 'H'
+      await QRCode.toCanvas(canvas, content, {
+        width: 400,
+        margin: 1.5,
+        color: {
+          dark: "#111827",
+          light: "#FFFFFF",
+        },
+        errorCorrectionLevel: "H",
+      });
+
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        // Load the logo image
+        const logo = new Image();
+        logo.crossOrigin = "anonymous";
+        await new Promise<void>((resolve) => {
+          logo.onload = () => resolve();
+          logo.onerror = () => resolve(); // fallback gracefully if logo fails
+          logo.src = logoUrl;
+        });
+
+        if (logo.complete && logo.naturalWidth > 0) {
+          // Logo dimensions (approx 22% of QR width for optimal scannability with Level H)
+          const logoSize = Math.floor(canvas.width * 0.22);
+          const x = (canvas.width - logoSize) / 2;
+          const y = (canvas.height - logoSize) / 2;
+
+          // White circular background pill behind the logo for quiet zone & contrast
+          const centerX = canvas.width / 2;
+          const centerY = canvas.height / 2;
+          const radius = logoSize / 2 + 5;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fill();
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = "#E5E7EB";
+          ctx.stroke();
+
+          // Draw the centered logo
+          ctx.drawImage(logo, x, y, logoSize, logoSize);
+          ctx.restore();
+        }
+      }
+
+      return canvas.toDataURL("image/png");
+    }
+
+    // Default / SSR fallback
     return await QRCode.toDataURL(content, {
       width: 400,
-      margin: 1,
+      margin: 1.5,
       color: {
         dark: "#111827",
         light: "#FFFFFF",
       },
-      errorCorrectionLevel: "M",
+      errorCorrectionLevel: "H",
     });
   } catch (err) {
     console.error("Error generating QR code:", err);

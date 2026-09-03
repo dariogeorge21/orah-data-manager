@@ -59,7 +59,7 @@ export default function DigitalTicket({
     let isMounted = true;
     const qrContent = ticketId || registration.id;
 
-    generateQrCodeDataUrl(qrContent).then((url) => {
+    generateQrCodeDataUrl(qrContent, "/jyLogo.png").then((url) => {
       if (isMounted) setQrCodeDataUrl(url);
     });
 
@@ -184,19 +184,17 @@ export default function DigitalTicket({
             </div>
           </div>
 
-          {/* Right Column: JY Logo, Centered Large Scannable QR Code & Entry Badge */}
-          <div className="flex-1 flex flex-col items-center justify-between py-0.5 pl-1.5 sm:pl-2 pr-1 h-full">
-            {/* Jesus Youth Logo */}
-            <div className="w-12 h-12">
-              <img
-                src="/jyLogo.png"
-                alt="Jesus Youth Logo"
-                className="w-full h-full object-contain drop-shadow-xs"
-              />
+          {/* Right Column: Centered Large Scannable QR Code with Embedded JY Logo & Entry Badge */}
+          <div className="flex-1 flex flex-col items-center justify-between py-1 sm:py-1.5 pl-1.5 sm:pl-2 pr-1 h-full">
+            {/* Entry Pass Header */}
+            <div className="text-center pt-0.5">
+              <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.16em] text-gray-800 leading-tight">
+                ENTRY PASS
+              </p>
             </div>
 
-            {/* Large Scannable QR Code */}
-            <div className="w-[208px] h-[208px] sm:w-[118px] sm:h-[118px] bg-white p-1.5 rounded-2xl shadow-sm border border-gray-300 flex items-center justify-center shrink-0">
+            {/* Large Scannable QR Code with Embedded JY Logo */}
+            <div className="w-[125px] h-[125px] sm:w-[135px] sm:h-[135px] bg-white p-1.5 rounded-2xl shadow-sm border border-gray-300 flex items-center justify-center shrink-0">
               {qrCodeDataUrl ? (
                 <img
                   src={qrCodeDataUrl}
