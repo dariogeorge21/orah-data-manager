@@ -128,7 +128,7 @@ export default function DigitalTicket({
             </h2>
             {institutionText && (
               <p
-                className="text-xs sm:text-sm font-semibold text-gray-700 truncate max-w-[400px] mt-1 tracking-tight leading-snug line-clamp-2 break-words"
+                className="text-xs sm:text-sm font-semibold text-gray-700 max-w-[400px] mt-1 tracking-tight leading-snug line-clamp-2 break-words"
                 title={institutionText}
               >
                 {institutionText}
