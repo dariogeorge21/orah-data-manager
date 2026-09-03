@@ -55,6 +55,11 @@ export default function DigitalTicket({
     institutionText = affiliation;
   }
 
+  // Format attendee display name (if name contains 3 or more words, show first 2 words: first + middle)
+  const fullName = registration.name?.trim() || "";
+  const nameParts = fullName.split(/\s+/).filter(Boolean);
+  const displayName = nameParts.length >= 3 ? nameParts.slice(0, 2).join(" ") : fullName;
+
   useEffect(() => {
     let isMounted = true;
     const qrContent = ticketId || registration.id;
@@ -122,9 +127,9 @@ export default function DigitalTicket({
           <div className="my-auto py-1">
             <h2
               className="text-2xl sm:text-3xl pb-2 lg:text-4xl font-black text-gray-900 tracking-tight leading-none truncate max-w-[380px]"
-              title={registration.name}
+              title={fullName}
             >
-              {registration.name}
+              {displayName}
             </h2>
             {institutionText && (
               <p
