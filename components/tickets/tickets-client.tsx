@@ -40,6 +40,7 @@ import {
 import { EnrichedTicketData } from "@/features/actions/tickets";
 import TicketModal from "./ticket-modal";
 import DigitalTicket from "./digital-ticket";
+import BulkExportModal from "./bulk-export-modal";
 import { downloadTicketAsPdf } from "@/lib/pdf-generator";
 import { toast } from "sonner";
 
@@ -58,6 +59,7 @@ export default function TicketsClient({ initialTickets }: TicketsClientProps) {
   // Modal preview state
   const [selectedTicket, setSelectedTicket] = useState<EnrichedTicketData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBulkExportOpen, setIsBulkExportOpen] = useState(false);
 
   // Single direct download loading tracker
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -251,6 +253,18 @@ export default function TicketsClient({ initialTickets }: TicketsClientProps) {
                 <div className="text-lg font-bold text-gray-900 leading-tight">{institutionOptions.length}</div>
               </div>
             </div>
+
+            {/* Batch Export Passes Button */}
+            <Button
+              onClick={() => setIsBulkExportOpen(true)}
+              className="h-[52px] px-5 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-semibold flex items-center gap-2.5 shadow-sm hover:shadow transition-all cursor-pointer"
+            >
+              <Download className="w-4 h-4 text-amber-400" />
+              <span>Export Tickets</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white px-2 py-0.5 rounded-full">
+                PDF / ZIP
+              </span>
+            </Button>
           </div>
         </div>
       </div>
@@ -613,6 +627,14 @@ export default function TicketsClient({ initialTickets }: TicketsClientProps) {
           ticketId={selectedTicket.ticket?.id || selectedTicket.registration.id}
         />
       )}
+
+      {/* Bulk Ticket Export Modal */}
+      <BulkExportModal
+        open={isBulkExportOpen}
+        onOpenChange={setIsBulkExportOpen}
+        allTickets={initialTickets}
+        filteredTickets={filteredTickets}
+      />
     </div>
   );
 }

@@ -21,6 +21,7 @@ export interface DigitalTicketProps {
   date?: string;
   time?: string;
   className?: string;
+  qrDataUrl?: string;
 }
 
 export default function DigitalTicket({
@@ -34,8 +35,9 @@ export default function DigitalTicket({
   date = "SEP 19",
   time = "5:00 PM",
   className = "",
+  qrDataUrl,
 }: DigitalTicketProps) {
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>(qrDataUrl || "");
 
   const formattedSeq =
     sequenceNumber < 10
@@ -61,6 +63,11 @@ export default function DigitalTicket({
   const displayName = nameParts.length >= 3 ? nameParts.slice(0, 2).join(" ") : fullName;
 
   useEffect(() => {
+    if (qrDataUrl) {
+      setQrCodeDataUrl(qrDataUrl);
+      return;
+    }
+
     let isMounted = true;
     const qrContent = ticketId || registration.id;
 
@@ -71,7 +78,7 @@ export default function DigitalTicket({
     return () => {
       isMounted = false;
     };
-  }, [ticketId, registration.id]);
+  }, [ticketId, registration.id, qrDataUrl]);
 
   return (
     <div
