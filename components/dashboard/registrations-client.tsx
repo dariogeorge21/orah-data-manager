@@ -36,11 +36,13 @@ import {
   X,
   Ticket as TicketIcon,
   Download,
-  Eye
+  Eye,
+  FileSpreadsheet
 } from "lucide-react";
 import { Registration } from "@/types/registration";
 import TicketModal from "@/components/tickets/ticket-modal";
 import DigitalTicket from "@/components/tickets/digital-ticket";
+import CsvExportModal from "@/components/common/csv-export-modal";
 import { generateTicketCode } from "@/lib/ticket-utils";
 import { downloadTicketAsPdf } from "@/lib/pdf-generator";
 import { toast } from "sonner";
@@ -113,6 +115,7 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
   const [selectedTicketReg, setSelectedTicketReg] = useState<Registration | null>(null);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [downloadingTicketId, setDownloadingTicketId] = useState<string | null>(null);
+  const [isCsvExportOpen, setIsCsvExportOpen] = useState(false);
   
   const pathname = usePathname();
 
@@ -384,25 +387,38 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
             />
           </div>
 
-          <div className="grid grid-cols-2 items-center gap-2 w-full sm:w-auto bg-gray-50 p-1.5 rounded-2xl border border-gray-200/60 shadow-inner">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setView("table")}
-              className={`rounded-xl px-4 h-10 sm:h-9 font-medium transition-all duration-300 ${view === "table" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            {/* CSV Export Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsCsvExportOpen(true)}
+              className="h-10 sm:h-9 px-3.5 rounded-xl border-gray-200 hover:border-gray-900 bg-white hover:bg-gray-50 text-gray-900 font-semibold flex items-center gap-2 shadow-2xs transition-all cursor-pointer"
             >
-              <List className="w-4 h-4 mr-2" />
-              Table
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+              <span>Export CSV</span>
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setView("card")}
-              className={`rounded-xl px-4 h-10 sm:h-9 font-medium transition-all duration-300 ${view === "card" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
-            >
-              <LayoutGrid className="w-4 h-4 mr-2" />
-              Cards
-            </Button>
+
+            <div className="grid grid-cols-2 items-center gap-2 flex-1 sm:flex-none bg-gray-50 p-1.5 rounded-2xl border border-gray-200/60 shadow-inner">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setView("table")}
+                className={`rounded-xl px-4 h-10 sm:h-9 font-medium transition-all duration-300 ${view === "table" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
+              >
+                <List className="w-4 h-4 mr-2" />
+                Table
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setView("card")}
+                className={`rounded-xl px-4 h-10 sm:h-9 font-medium transition-all duration-300 ${view === "card" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
+              >
+                <LayoutGrid className="w-4 h-4 mr-2" />
+                Cards
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -921,6 +937,17 @@ export default function RegistrationsClient({ eventId, initialData }: Registrati
           ticketId={selectedTicketReg.id}
         />
       )}
+
+      {/* Enhanced CSV Export Modal */}
+      <CsvExportModal
+        open={isCsvExportOpen}
+        onOpenChange={setIsCsvExportOpen}
+        allItems={normalizedRegistrations}
+        filteredItems={filteredData}
+        title="Export Registrations to CSV"
+        defaultFilename="ORAH_2K26_Registrations_Export"
+        itemName="registrations"
+      />
     </div>
   );
 }
